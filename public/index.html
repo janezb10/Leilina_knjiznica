@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domaca knjiznica</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <header>
+        <h1>Domača knjižnica</h1>
+    </header>
+    <div id="container">
+        <form id="search">
+            <label for="s-input">Išči avtorja ali naslov</label>
+            <input id="s-input" type="text">
+            <button id="s-button">Search</button>
+            <br />
+            <label for="id-input">Išči knjigo po id</label>
+            <input id="id-input" type="text">
+            <button id="id-input">dobi knjigo</button>
+            <p id="form-inp"></p>
+        </form>
+        <ul id="book-list">
+            <li class="book-in-list">
+                <div>
+                    <h4>naslov naslov</h4>
+                    <h5>Avtor avtor</h5>
+                    <p>področje</p>
+                </div>
+                <div>
+                    <p>edit</p>
+                    <p>leto</p>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <script src="./index.js"></script>
+</body>
+
+</html>

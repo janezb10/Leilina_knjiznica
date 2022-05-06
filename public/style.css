@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Overpass:wght@400;700&family=Water+Brush&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    height: 10rem;
+    background-color: #640886;
+}
+
+h1 {
+    margin: 0 auto;
+    padding: 2.5rem;
+    width: 80vw;
+    min-width: 550px;
+    max-width: 1200px;
+    color: #fff;
+    font-size: 5rem;
+    font-family: 'Water Brush', cursive;
+}
+
+#container {
+    width: 80vw;
+    min-width: 500px;
+    max-width: 1100px;
+    margin: 0 auto;
+    border-left: 2px solid #640886;
+    border-right: 2px solid #640886;
+}
+
+#container form {
+    padding: 1rem 1rem;
+    border-bottom: 5px solid #640886;
+    color: #33133F;
+}
+
+#book-list {
+    list-style-type: none;
+}
+
+.book-in-list {
+    padding: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid #640886;
+
+}

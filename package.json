@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "joi": "^17.6.0",
+    "mariadb": "^3.0.0",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.3.3"
+  },
+  "name": "domaca_knjiznica",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/janezb10/domaca_knjiznica.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/janezb10/domaca_knjiznica/issues"
+  },
+  "homepage": "https://github.com/janezb10/domaca_knjiznica#readme",
+  "description": ""
+}
