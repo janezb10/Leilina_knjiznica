@@ -24,6 +24,18 @@ const connection = mysql.createConnection({
 
 
 /* IŠČI KNJIGI IN DOBI SEZNAM KNJIG KI USTREZAJO KRITERIJU */
+
+/* SELECT * 
+FROM (((Leilina_knjiznica lk 
+INNER JOIN podrocje pod 
+        ON lk.id_podrocje = pod.id_podrocje 
+        AND lk.id_podpodrocje = pod.id_podpodrocje) 
+INNER JOIN jezik je 
+       ON lk.id_jezik = je.id_jezik) 
+INNER JOIN pozicija poz 
+      ON lk.id_pozicija = poz.id_pozicija) 
+WHERE id = 5;  */
+
 router.get('/search', async (req, res) => {
     /* check input */
     const schema = Joi.object({
