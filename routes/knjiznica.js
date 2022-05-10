@@ -6,11 +6,6 @@ const Joi = require('joi');
 const { append } = require("express/lib/response");
 
 
-/*test456*/
-
-/*test123*/
-
-
 router.use(express.json());
 
 const connection = mysql.createConnection({
@@ -24,17 +19,6 @@ const connection = mysql.createConnection({
 
 
 /* IŠČI KNJIGI IN DOBI SEZNAM KNJIG KI USTREZAJO KRITERIJU */
-
-/* SELECT * 
-FROM (((Leilina_knjiznica lk 
-INNER JOIN podrocje pod 
-        ON lk.id_podrocje = pod.id_podrocje 
-        AND lk.id_podpodrocje = pod.id_podpodrocje) 
-INNER JOIN jezik je 
-       ON lk.id_jezik = je.id_jezik) 
-INNER JOIN pozicija poz 
-      ON lk.id_pozicija = poz.id_pozicija) 
-WHERE id = 5;  */
 
 router.get('/search', async (req, res) => {
     /* check input */
@@ -50,7 +34,11 @@ router.get('/search', async (req, res) => {
 
     /* connect to database and return result */
     connection.query(
-        `select id, avtor, naslov from Leilina_knjiznica where avtor like "%${req.query.keyword}%"`,
+        `
+        SELECT id, avtor, naslov
+        FROM Leilina_knjiznica
+        WHERE avtor 
+            LIKE "%${req.query.keyword}%"`,
         function (err, results, fields) {
             console.log(results);
             if (results.length == 0) return res.status(404).send();
@@ -64,7 +52,7 @@ router.get('/search', async (req, res) => {
 router.get('/bookID', async (req, res) => {
     /* check input */
     const schema = Joi.object({
-        id: Joi.number().min(0).required()
+        bookID: Joi.number().min(0).required()
     });
     try {
         const value = await schema.validateAsync(req.query);
@@ -74,7 +62,18 @@ router.get('/bookID', async (req, res) => {
     }
     /* connect to database and return result*/
     connection.query(
-        `select * from Leilina_knjiznica where id = ${req.query.id}`,
+        `
+        SELECT id, naslov, avtor, jezik, zbirka, drzava, leto, podrocje, podpodrocje, pozicija, opombe
+        FROM (((Leilina_knjiznica lk 
+        INNER JOIN podrocje pod 
+            ON lk.id_podrocje = pod.id_podrocje 
+            AND lk.id_podpodrocje = pod.id_podpodrocje) 
+        INNER JOIN jezik je 
+            ON lk.id_jezik = je.id_jezik) 
+        INNER JOIN pozicija poz 
+            ON lk.id_pozicija = poz.id_pozicija) 
+        WHERE id = ${req.query.bookID};
+        `,
         function (err, results, fields) {
             console.log(results);
             if (results.length == 0) return res.status(404).send();
@@ -87,12 +86,12 @@ router.get('/bookID', async (req, res) => {
 router.post('/newBook', async (req, res) => {
     /* preveri če je req.body kull */
     const schema = Joi.object({
-        podrocje: Joi.number()
+        id_podrocje: Joi.number()
             .min(0)
             .max(9)
             .integer()
             .required(),
-        podpodrocje: Joi.number()
+        id_podpodrocje: Joi.number()
             .min(0)
             .max(14)
             .integer()
@@ -105,12 +104,12 @@ router.post('/newBook', async (req, res) => {
             .min(1)
             .max(91)
             .required(),
-        poz: Joi.number()
+        id_pozicija: Joi.number()
             .min(0)
             .max(4)
             .integer()
             .required(),
-        jezik: Joi.number()
+        id_jezik: Joi.number()
             .min(0)
             .max(4)
             .integer()
@@ -127,30 +126,30 @@ router.post('/newBook', async (req, res) => {
     });
     try {
         const o = await schema.validateAsync(req.body);
+        connection.query(
+            `INSERT INTO Leilina_knjiznica 
+            (id_podrocje, id_podpodrocje, naslov, avtor, id_pozicija, id_jezik, zbirka, drzava, opombe, leto) 
+            VALUES ("${req.body.id_podrocje}", 
+            "${req.body.id_podpodrocje}", 
+            "${req.body.naslov}", 
+            "${req.body.avtor}", 
+            "${req.body.id_pozicija}", 
+            "${req.body.id_jezik}", 
+            ${req.body.zbirka || "NULL"}, 
+            ${req.body.drzava || "NULL"}, 
+            ${req.body.opombe || "NULL"}, 
+            ${req.body.leto || "NULL"});`,
+            function (err, results, fields) {
+                console.log(err);
+                console.log(results);
+                if (!err) res.send(req.body);
+            }
+        )
     }
     catch (err) {
         return res.status(400).send(err);
     }
 
-    connection.query(
-        `INSERT INTO Leilina_knjiznica 
-        (podrocje, podpodrocje, naslov, avtor, poz, jezik, zbirka, drzava, opombe, leto) 
-        VALUES ("${req.body.podrocje}", 
-        "${req.body.podpodrocje}", 
-        "${req.body.naslov}", 
-        "${req.body.avtor}", 
-        "${req.body.poz}", 
-        "${req.body.jezik}", 
-        "${req.body.zbirka}", 
-        "${req.body.drzava}", 
-        "${req.body.opombe}", 
-        "${req.body.leto}");`,
-        function (err, results, fields) {
-            console.log(err);
-            console.log(results);
-            if (!err) res.send(req.body);
-        }
-    )
 })
 
 /* POSODOBI PODATKE KNJIGI Z IDJEM */
@@ -160,12 +159,12 @@ router.put('/updateBook/:id', async (req, res) => {
             .integer()
     });
     const schemab = Joi.object({
-        podrocje: Joi.number()
+        id_podrocje: Joi.number()
             .min(0)
             .max(9)
             .integer()
             .required(),
-        podpodrocje: Joi.number()
+        id_podpodrocje: Joi.number()
             .min(0)
             .max(14)
             .integer()
@@ -178,12 +177,12 @@ router.put('/updateBook/:id', async (req, res) => {
             .min(1)
             .max(91)
             .required(),
-        poz: Joi.number()
+        id_pozicija: Joi.number()
             .min(0)
             .max(4)
             .integer()
             .required(),
-        jezik: Joi.number()
+        id_jezik: Joi.number()
             .min(0)
             .max(4)
             .integer()
@@ -208,21 +207,21 @@ router.put('/updateBook/:id', async (req, res) => {
                 if (err) throw err;
             }
         )
-
         const vb = await schemab.validateAsync(req.body);
         connection.query(
-            `UPDATE Leilina_knjiznica 
+            `
+            UPDATE Leilina_knjiznica 
             SET 
-            podrocje = "${vb.podrocje}", 
-            podpodrocje = "${vb.podpodrocje}", 
+            id_podrocje = "${vb.id_podrocje}", 
+            id_podpodrocje = "${vb.id_podpodrocje}", 
             naslov = "${vb.naslov}", 
             avtor = "${vb.avtor}", 
-            poz = "${vb.poz}", 
-            jezik = "${vb.jezik}", 
-            zbirka = "${vb.zbirka}", 
-            drzava = "${vb.drzava}", 
-            opombe = "${vb.opombe}", 
-            leto = "${vb.leto}" 
+            id_pozicija = "${vb.id_pozicija}", 
+            id_jezik = "${vb.id_jezik}", 
+            zbirka = ${vb.zbirka || "NULL"}, 
+            drzava = ${vb.drzava || "NULL"}, 
+            opombe = ${vb.opombe || "NULL"}, 
+            leto = ${vb.leto || "NULL"} 
             WHERE id = ${valuep.id};`,
             function (err, results, fields) {
                 console.log(err);
