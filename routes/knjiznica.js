@@ -35,8 +35,15 @@ router.get('/search', async (req, res) => {
     /* connect to database and return result */
     connection.query(
         `
-        SELECT id, avtor, naslov
-        FROM Leilina_knjiznica
+        SELECT id, naslov, avtor, jezik, zbirka, drzava, leto, podrocje, podpodrocje, pozicija, opombe
+        FROM (((Leilina_knjiznica lk 
+        INNER JOIN podrocje pod 
+            ON lk.id_podrocje = pod.id_podrocje 
+            AND lk.id_podpodrocje = pod.id_podpodrocje) 
+        INNER JOIN jezik je 
+            ON lk.id_jezik = je.id_jezik) 
+        INNER JOIN pozicija poz 
+            ON lk.id_pozicija = poz.id_pozicija) 
         WHERE avtor 
             LIKE "%${req.query.keyword}%"`,
         function (err, results, fields) {
@@ -47,6 +54,41 @@ router.get('/search', async (req, res) => {
     );
 })
 
+/* PRIDOBI JEZIKE */
+router.get('/jeziki', async (req, res) => {
+    connection.query(
+        `
+        SELECT *
+        FROM jezik`,
+        function (err, results, fields) {
+            res.send(results);
+        }
+    )
+})
+
+/* PRIDOBI POZICIJE */
+router.get('/pozicije', async (req, res) => {
+    connection.query(
+        `
+        SELECT *
+        FROM pozicija`,
+        function (err, results, fields) {
+            res.send(results);
+        }
+    )
+})
+
+/* PRIDOBI PODROČJA */
+router.get('/podrocja', async (req, res) => {
+    connection.query(
+        `
+        SELECT UNIQUE podrocje, id_podrocje
+        FROM podrocje`,
+        function (err, results, fields) {
+            res.send(results);
+        }
+    )
+})
 
 /* PRIDOBI KNJIGO Z DOLOČENIM IDJEM */
 router.get('/bookID', async (req, res) => {
