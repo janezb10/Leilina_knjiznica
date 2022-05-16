@@ -90,6 +90,16 @@ router.get('/podrocja', async (req, res) => {
     )
 })
 
+/* PRIDOBI PODROČJA IN PODPODROČJA */
+router.get('/podrocjaPodpodrocja', async (req, res) => {
+    connection.query(`
+    SELECT *
+    FROM podrocje`,
+        function (err, results, fields) {
+            res.send(results);
+        })
+})
+
 /* PRIDOBI KNJIGO Z DOLOČENIM IDJEM */
 router.get('/bookID', async (req, res) => {
     /* check input */
